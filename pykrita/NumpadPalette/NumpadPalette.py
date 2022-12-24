@@ -20,9 +20,9 @@ def keyboard_set(ckb_pipe, colors_in):
             f.write('rgb ' + key + ':' + value + '\n')
 
 
-def color_to_hex(color):
+def color_to_ckb(color):
     color = color.components()
-    return ''.join(f'%02x' % (min(max(int(color[i] * 256.0), 0), 255), ) for i in range(4))
+    return ''.join(f'%02x' % (min(max(int(color[i] * 256.0), 0), 255), ) for i in [2, 1, 0, 3])
 
 
 def get_palette_size(palette):
@@ -42,6 +42,8 @@ def get_current_palette(app):
             if label is None:
                 return None
             palette_name = label.text()
+            if palette_name.startswith('* '): # strip 'edited' indicator (sigh...)
+                palette_name = palette_name[2:]
 
             # Look up resource by name.
             resources = app.resources("palette")
@@ -98,7 +100,7 @@ class NumpadPaletteExtension(Extension):
 
         to_set = {}
         for key in KEYS:
-            to_set[key[0]] = color_to_hex(self.getColor(palette, key[1]))
+            to_set[key[0]] = color_to_ckb(self.getColor(palette, key[1]))
 
         keyboard_set(CKB_PIPE, to_set)
 
