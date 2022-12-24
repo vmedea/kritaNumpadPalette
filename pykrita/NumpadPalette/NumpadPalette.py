@@ -1,8 +1,7 @@
-from krita import *
+from krita import Extension, Krita, ManagedColor, Palette
 import functools
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QErrorMessage
+from PyQt5.QtWidgets import QErrorMessage, QLabel
 
 from .layout import KEYS, MOVEMENT
 
@@ -160,5 +159,4 @@ class NumpadPaletteExtension(Extension):
             action = window.createAction(name, name, "")
             action.triggered.connect(functools.partial(self.move, key[2]))
 
-#Adding extension to Krita's list of extensions
 Krita.instance().addExtension(NumpadPaletteExtension(Krita.instance()))
