@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=NumpadPalette
+X-Python-2-Compatible=false
+Name=NumpadPalette
+Comment=A plugin that enables use of RGB led numpad as palette browser
