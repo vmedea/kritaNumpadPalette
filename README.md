@@ -10,16 +10,28 @@ When enabled, the plugin will show the colors of the top-left swatches of the cu
 
 You can move around in the palette (change the offset) with `Alt-` and the numeric keypad arrow keys. `Alt-5` resets position to the top left.
 
-For now, you'll need to push one of the keys to initially trigger the plugin, and to update after palette changes. These aren't detected automatically at the moment.
+For now, you'll need to push one of the keys to initially trigger the plugin, and to update after palette changes. These aren't detected automatically.
 
-## ckb-next setup
+## Motivation
+
+I have this fancy RGB keyboard for whatever reason, and wondered if there is a way to actually use it in a constructive way, and not just for silly gamer effects. One of my directions of thinking was "can I somehow use this for art tooling", and this idea came to mind. Switching to certain colors instantly can be useful for pixel art.
+
+I'm not exactly convinced that this plugin is super useful, for example the definition of the RGB leds is only barely enough to recognize the palette colors. But it's an interesting experiment nevertheless.
+
+## Setup
+
+### Krita setup
+
+Copy the or link `pykrita` and `actions` folder contents to your local krita resources (usually `~/.local/share/krita`). Enable the plugin and restart Krita.
+
+### ckb-next setup
 
 - Under 'Performance' tab, set 'Num lock:' to 'always off'. We won't use the numlock as numlock but as extra function key.
 - Under 'Lighting', add a `pipe` animation:
     - Give it id `1` (socket `/tmp/ckbpipe001` is hardcoded at the moment).
     - Assign (only) the numeric keypad keys to it. If you can't assign numlock, see above.
 
-## Keyboard mapping
+### Keyboard mapping setup
 
 Using this plugin requires setting up the following binding for numeric keypad keys in your window manager:
 
@@ -42,7 +54,7 @@ Using this plugin requires setting up the following binding for numeric keypad k
 +-----+-----+-----+-----|
 ```
 
-### Why is this needed?
+#### Why is this needed?
 
 Qt (as of 5.15.3) doesn't understand shortcuts with `KeypadModifier`, which would be required to make this work directly. It will completely ignore them, and trigger the non-keypad shortcut instead (according to QTBUG-20191, it's supposedly fixed but I couldn't get it to work in any way).
 
@@ -52,13 +64,13 @@ So, the alternative way to make sure nothing interferes, is to remap the numpad 
 
 (another option that might possibly work is to lay a widget over the canvas that intercepts events like done in [kritaCellBasedSelection](https://github.com/vmedea/kritaCellBasedSelection), however, this is hard to do consistently and it might add input lag)
 
-### Could rebinding in ckb-next work?
+#### Could rebinding in ckb-next work?
 
 Possibly. But it doesn't give enough `Fxx` keys to make it work. Also, it seems that if you assign something to say, `F13` at the evdev level, it will actually assign it to some `XF86Tools` key (and so on...), due to xkb mapping shenanigans.
 
 Why is this all so exhausting? I wish I knew. What at first glance seemed easy, became an expedition through the guts of OS input handling. Sometimes it's as if we optimized this world to maximize the number of hidden traps in everything. I do not claim to be innocent in this.
 
-### X11
+#### X11
 
 - Add the following to `~/.Xmodmap`:
 
@@ -85,7 +97,7 @@ keycode 91 = F29 F29 F29
 - load with `xmodmap ~/.Xmodmap` (or log in again)
 - debug with `xmodmap -pke`
 
-### Wayland
+#### Wayland
 
 
 - Put in `~/.xkb/symbols/custom`:
@@ -124,3 +136,14 @@ input "type:keyboard" {
 ```
 
 For other wayland compositors, you'll need to find how to change the xkb layout.
+
+## Future ideas
+
+- Automatically detect palette changes (hook into switching document, switching palette, changing a palette color... somehow. I don't think Krita has any official hooks for these but there's probably some Qt signals).
+
+- Show the current foreground/background color on some other key.
+
+- Add some UI feedback (mostly of current palette position).
+
+- Could have a fifth palette row if we use the four media keys above the keypad too.
+
