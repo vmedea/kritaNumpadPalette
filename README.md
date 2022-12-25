@@ -75,6 +75,9 @@ Why is this all so exhausting? I wish I knew. What at first glance seemed easy, 
 - Add the following to `~/.Xmodmap`:
 
 ```
+! clear numlock modifier
+clear mod2
+! reassign numpad to F13..F29
 keycode 77 = F13 F13 F13
 keycode 106 = F14 F14 F14
 keycode 63 = F15 F15 F15
@@ -104,7 +107,9 @@ keycode 91 = F29 F29 F29
 
 ```
 xkb_symbols "custom" {
-    include "pc+us"
+    include "pc+us+inet(evdev)"
+
+    modifier_map Mod2 { };
 
     replace key <NMLK>   {      [ F13 ]       };
     replace key <KPDV>   {      [ F14 ]       };
