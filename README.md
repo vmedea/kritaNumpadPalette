@@ -4,6 +4,9 @@ A Krita plugin that enables use of a RGB led numeric keyboard as palette browser
 
 Tested with [ckb-next](https://github.com/ckb-next/ckb-next) and a Corsair K95 RGB Platinum Keyboard only.
 
+![Keyboard numpad with palette in RGB](images/keyboard.jpg)
+![Associated palette](images/palette.png)
+
 ## Usage
 
 When enabled, the plugin will show the colors of the top-left swatches of the current palette on the numeric keypad keys. Pressing a key will set the color on that key as foreground color. Holding `Shift` and pressing a key sets it as background color.
