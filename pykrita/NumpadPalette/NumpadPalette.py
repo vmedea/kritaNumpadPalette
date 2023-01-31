@@ -1,5 +1,7 @@
 from krita import Extension, Krita, ManagedColor, Palette
+import fcntl
 import functools
+import os
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QErrorMessage, QLabel
 
@@ -7,17 +9,28 @@ from .layout import KEYS, MOVEMENT
 
 CKB_PIPE = '/tmp/ckbpipe001'
 
-# For color setting, see
-#    https://github.com/vmedea/ckb-next-integrations/blob/main/keyleds-ckb.vim
 def keyboard_set(ckb_pipe, colors_in):
     '''
     Send a series of commands to ckb-next to change key RBGA colors.
     Colors must be in RRGGBBAA hexadecimal format.
     '''
-    with open(ckb_pipe, 'w') as f:
-        for (key, value) in colors_in.items():
-            f.write('rgb ' + key + ':' + value + '\n')
+    try:
+        # Briefly disable blocking to prevent the pipe from being stuck in open.
+        fd = os.open(ckb_pipe, os.O_WRONLY | os.O_NONBLOCK)
+        try:
+            # Disable non-blocking before writing values.
+            flag = fcntl.fcntl(fd, fcntl.F_GETFL)
+            fcntl.fcntl(fd, fcntl.F_SETFL, flag & ~(os.O_NONBLOCK))
 
+            # Send values
+            for (key, value) in colors_in.items():
+                os.write(fd, b'rgb ' + key.encode() + b':' + value.encode() + b'\n')
+        finally:
+            os.close(fd)
+    except IOError:
+        # Ignore I/O errors here. It means the other end is not
+        # connected or otherwise broken, and we can't do anything.
+        pass
 
 def color_to_ckb(color):
     color = color.components()
