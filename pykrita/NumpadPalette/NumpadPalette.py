@@ -67,6 +67,14 @@ def get_current_palette(app):
 
     return None
 
+def _make_dummy_color():
+    color = ManagedColor("RGBA", "U8", "")
+    color.setComponents([0.0, 0.0, 0.0, 1.0])
+    return color
+
+# Solid black color for out-of-range queries.
+DUMMY_COLOR = _make_dummy_color()
+
 class NumpadPaletteExtension(Extension):
 
     def __init__(self, parent):
@@ -95,13 +103,14 @@ class NumpadPaletteExtension(Extension):
         Get a color from the palette, by coordinate.
         '''
         coord = [self.ofs[0] + coord[0], self.ofs[1] + coord[1]]
-        if palette is None or coord[0] < 0 or coord[1] < 0 or coord[0] >= palette.columnCount():
-            # Return solid black if no palette or out of range.
-            color = ManagedColor("RGBA", "U8", "")
-            color.setComponents([0.0, 0.0, 0.0, 1.0])
-            return color
+        index = (coord[0] + coord[1] * palette.columnCount()) if palette is not None else 0
+        if (palette is None
+          or coord[0] < 0
+          or coord[1] < 0
+          or coord[0] >= palette.columnCount()
+          or index >= palette.numberOfEntries()):
+            return DUMMY_COLOR
 
-        index = coord[0] + coord[1] * palette.columnCount()
         return palette.colorSetEntryByIndex(index).color()
 
     def updateKeyboard(self):
